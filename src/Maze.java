@@ -36,7 +36,6 @@ public class Maze {
             Point p = q.remove();
 
             if (graph[p.x][p.y] == 4) {
-                System.out.println("Exit is reached!");
                 return p;
             }
 
@@ -75,7 +74,7 @@ public class Maze {
 
     public static void main(String[] args) throws IOException {
         Stack<Point> stack = new Stack<>();
-        File file = new File("C:\\Users\\LENOVO\\Downloads\\Compressed\\maze10_2.txt");
+        File file = new File("C:\\Users\\LENOVO\\Downloads\\Compressed\\maze30_1.txt");
         FileReader fr = new FileReader(file);
         BufferedReader bufferedReader = new BufferedReader(fr);
 
@@ -91,8 +90,6 @@ public class Maze {
         double SqrRoot = Math.sqrt(characterCount);
         int dimension = (int) SqrRoot;
 
-        System.out.println("character count" + characterCount);
-        System.out.println("rows & columns " + dimension);
 
         int[][] graph = new int[dimension][dimension];
 
@@ -126,7 +123,6 @@ public class Maze {
         }
         Point p = getPathBFS(startX, startY, graph);
 
-
         while (true) {
             assert p != null;
             if (p.getParent() == null) break;
@@ -136,20 +132,50 @@ public class Maze {
 
         }
         stack.push(p);
-        System.out.println("...................................");
+        int[] corX = new int[stack.size()];
+        int[] corY = new int[stack.size()];
+        int idx = 0;
+
         Point curr = stack.pop();
 
 
-        System.out.println("Start - " + curr);
-        curr = stack.pop();
-
-
         while (!stack.isEmpty()) {
-            System.out.println(curr);
+            corX[idx] = curr.x;
+            corY[idx] = curr.y;
             curr = stack.pop();
+            idx++;
         }
-        System.out.println(curr);
+        corX[idx] = curr.x;
+        corY[idx] = curr.y;
+        printDirections(corX, corY);
 
+    }
+
+    public static String getDirection(int x1, int y1, int x2, int y2) {
+        if (x1 == x2 && y1 > y2)
+            return "Left";
+        if (x1 == x2 && y1 < y2)
+            return "Right";
+        if (y1 == y2 && x1 < x2)
+            return "Down";
+        if (y1 == y2 && x1 > x2)
+            return "Up";
+        return "undecidable";
+    }
+
+    public static void printDirections(int[] x, int[] y) {
+        System.out.printf("Start at ( %d , %d )", x[0], y[0]);
+
+        String lastDirection = getDirection(x[0], y[0], x[1], y[1]);
+        for (int i = 1; i < x.length - 1; i++) {
+            String direction = getDirection(x[i], y[i], x[i + 1], y[i + 1]);
+            if (!lastDirection.equals(direction)) {
+                System.out.printf("\nMove %s to ( %d , %d )", lastDirection, x[i], y[i]);
+            }
+            lastDirection = direction;
+        }
+        System.out.printf("\nMove %s to ( %d , %d )", lastDirection, x[x.length - 1], y[y.length - 1]);
+        System.out.println("\nDone !");
     }
 
 }
