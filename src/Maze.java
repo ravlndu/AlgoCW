@@ -2,9 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class Maze {
-
-
-    //to store matrix cell coordinates
+    //data structure to store matrix cell coordinates
     private static class Point {
         int x;
         int y;
@@ -25,20 +23,29 @@ public class Maze {
         }
     }
 
+    // check whether given cell is valid
+    public static boolean isFree(int x, int y, int[][] arr) {
+        return (x >= 0 && x < arr.length) && (y >= 0 && y < arr[x].length) && (arr[x][y] == 0 || arr[x][y] == 4);
+    }
+
+    //queue to store cells
     public static Queue<Point> q = new LinkedList<>();
 
-
+    // BFS algorithm to acquire the shortest path to destination
     public static Point getPathBFS(int x, int y, int[][] graph) {
 
+        //start point
         q.add(new Point(x, y, null));
 
         while (!q.isEmpty()) {
             Point p = q.remove();
 
+            //finding destination coordinate
             if (graph[p.x][p.y] == 4) {
                 return p;
             }
 
+            //checking neighbour cells for path and add path to the queue
             if (isFree(p.x + 1, p.y, graph)) {
                 graph[p.x][p.y] = -1;
                 Point nextP = new Point(p.x + 1, p.y, p);
@@ -68,11 +75,8 @@ public class Maze {
     }
 
 
-    public static boolean isFree(int x, int y, int[][] arr) {
-        return (x >= 0 && x < arr.length) && (y >= 0 && y < arr[x].length) && (arr[x][y] == 0 || arr[x][y] == 4);
-    }
-
     public static void main(String[] args) throws IOException {
+        //File reader
         Stack<Point> stack = new Stack<>();
         File file = new File("C:\\Users\\LENOVO\\Downloads\\Compressed\\maze30_1.txt");
         FileReader fr = new FileReader(file);
@@ -82,20 +86,20 @@ public class Maze {
         int characterCount = 0;
         int startX = 0;
         int startY = 0;
+        // counting dimension of the maze
         while ((character = bufferedReader.readLine()) != null) {
             characterCount += character.length();
 
         }
-
         double SqrRoot = Math.sqrt(characterCount);
         int dimension = (int) SqrRoot;
 
-
+        // 2d array for the maze
         int[][] graph = new int[dimension][dimension];
-
         FileReader fr2 = new FileReader(file);
         BufferedReader br = new BufferedReader(fr2);
 
+        //initializing maze and replacing characters into integers
         String line;
         int i = 0;
         int j = 0;
@@ -121,15 +125,16 @@ public class Maze {
             i++;
 
         }
+
+        // finding the shortest path
         Point p = getPathBFS(startX, startY, graph);
 
+        //output path with coordinates in reverse order
         while (true) {
             assert p != null;
             if (p.getParent() == null) break;
             stack.push(p);
             p = p.getParent();
-
-
         }
         stack.push(p);
         int[] corX = new int[stack.size()];
@@ -137,8 +142,6 @@ public class Maze {
         int idx = 0;
 
         Point curr = stack.pop();
-
-
         while (!stack.isEmpty()) {
             corX[idx] = curr.x;
             corY[idx] = curr.y;
@@ -151,6 +154,7 @@ public class Maze {
 
     }
 
+    //acquiring directions
     public static String getDirection(int x1, int y1, int x2, int y2) {
         if (x1 == x2 && y1 > y2)
             return "Left";
@@ -163,6 +167,7 @@ public class Maze {
         return "undecidable";
     }
 
+    //method to print output
     public static void printDirections(int[] x, int[] y) {
         System.out.printf("Start at ( %d , %d )", x[0], y[0]);
 
